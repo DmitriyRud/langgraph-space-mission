@@ -13,6 +13,20 @@
 
 ---
 
+## Preview
+
+### LangGraph Live Inspector & Mission Control
+Real-time `StateGraph` execution with parallel `Send()` specialist fan-out, Safety Officer revision loops (`2x`/`3x` badges), ship telemetry deltas, AI Crew panels, and the 6-tab Developer Console (`Execution Logs`, `State`, `State Diff`, `Checkpoints`, `LLM Calls`, `LangGraph Learning`):
+
+![LangGraph Live Inspector and Mission Control](./docs/assets/live-inspector.png)
+
+### Interactive 3D Hologram of AURORA-7 (Three.js)
+Full-screen 3D holographic telemetry deck whose reactor core, gravity ring, thruster plumes, comms pulses, and radiation shield react dynamically to `MissionState`:
+
+![AURORA-7 3D Holographic Telemetry Deck](./docs/assets/hologram-3d.png)
+
+---
+
 ## Why This Project Exists (Learning LangGraph)
 
 Most LangGraph tutorials print logs to a terminal. This project turns every core LangGraph primitive into something you can **see, click, pause, inspect, replay, and fork**:
