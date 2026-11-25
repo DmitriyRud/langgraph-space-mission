@@ -1,0 +1,304 @@
+{
+  "app": {
+    "documentTitle": "AI Space Mission — AURORA-7 LangGraph Simulator",
+    "switchToDemo": "Switch to Demo Mode",
+    "toast": {
+      "restoredPaused": "Restored paused mission {missionId} from SQLite checkpoint.",
+      "backendError": "Failed to connect to backend API.",
+      "startError": "Failed to start mission",
+      "randomSelected": "Selected random scenario: {title}",
+      "restoredMission": "Restored mission {missionId} ({status}).",
+      "restoreError": "Failed to restore mission",
+      "resumeError": "Failed to resume mission",
+      "switchedToDemoResumed": "Switched mission to Demo Mode and resumed from checkpoint.",
+      "startedNewDemo": "Started new mission in Demo Mode.",
+      "forkCreated": "Time Travel Fork created: {missionId} from {checkpointId}...",
+      "forkError": "Failed to fork checkpoint",
+      "exportError": "Export failed"
+    }
+  },
+  "header": {
+    "subtitle": "LangGraph Multi-Agent Live Inspector",
+    "awaitingApproval": "AWAITING CAPTAIN APPROVAL",
+    "demoMode": "DEMO MODE",
+    "liveLlm": "LIVE LLM",
+    "connectedTo": "Connected to {provider}",
+    "sseTitle": "Server-Sent Events Stream",
+    "sseLive": "SSE LIVE",
+    "sseIdle": "SSE IDLE",
+    "settingsTitle": "System & LLM Settings"
+  },
+  "missionStatus": {
+    "Operational": "Operational",
+    "Alert": "Alert",
+    "Critical": "Critical",
+    "Stabilized": "Stabilized",
+    "Failed": "Failed"
+  },
+  "missionDbStatus": {
+    "created": "created",
+    "running": "running",
+    "awaiting_approval": "awaiting_approval",
+    "completed": "completed",
+    "failed": "failed",
+    "error": "error",
+    "cancelled": "cancelled"
+  },
+  "severity": {
+    "low": "LOW",
+    "medium": "MEDIUM",
+    "high": "HIGH",
+    "critical": "CRITICAL"
+  },
+  "risk": {
+    "low": "low",
+    "medium": "medium",
+    "high": "high",
+    "critical": "critical"
+  },
+  "controlBar": {
+    "random": "Random",
+    "randomTitle": "Pick a random emergency scenario",
+    "startMission": "Start Mission",
+    "reset": "Reset",
+    "resetTitle": "Reset dashboard view",
+    "restoreMission": "Restore Mission ({count})",
+    "restoreTitle": "Restore an existing or paused mission from SQLite checkpoints",
+    "live": "LIVE",
+    "replay": "REPLAY ({count})",
+    "prevEvent": "Previous recorded event",
+    "nextEvent": "Next recorded event",
+    "checkpoints": "Checkpoints",
+    "exportJson": "Export JSON",
+    "iter": "ITER {current}/{max}"
+  },
+  "hitl": {
+    "header": "LANGGRAPH INTERRUPT() — CAPTAIN AUTHORIZATION REQUIRED (ITERATION {iteration})",
+    "riskLabel": "Risk: {risk}",
+    "proposedActions": "Proposed Actions ({count})",
+    "projectedDeltas": "Projected Telemetry Deltas",
+    "resources": "Resources:",
+    "safetyVerdict": "Safety Officer Verdict: {verdict}",
+    "verdictApproved": "APPROVED",
+    "verdictEscalated": "ESCALATED",
+    "feedbackLabel": "Captain Directive / Revision Comment (passed to Commander on Reject/Revision)",
+    "feedbackPlaceholder": "Optional instructions, e.g. 'Conserve reserve fuel and prioritize crew health'",
+    "reject": "Reject Plan",
+    "requestRevision": "Request Revision",
+    "defaultRevisionFeedback": "Please revise plan with lower risk",
+    "approve": "Approve & Execute"
+  },
+  "settings": {
+    "title": "LLM & Simulator Settings",
+    "languageSection": "INTERFACE LANGUAGE",
+    "languageHint": "Applies to UI labels, scenarios, graph nodes, learning guide, and new missions.",
+    "executionMode": "EXECUTION MODE",
+    "demoMode": "Demo Mode",
+    "liveMode": "Live Mode (Ollama)",
+    "modeDescription": "Both modes execute the exact same LangGraph StateGraph, reducers, checkpoints, and human-in-the-loop interrupts on the backend. Demo Mode uses deterministic agent responses for fast testing and mentor demos without requiring Ollama.",
+    "localLlmStatus": "LOCAL LLM STATUS",
+    "refresh": "Refresh",
+    "provider": "Provider:",
+    "endpoint": "Endpoint:",
+    "activeModel": "Active Model:",
+    "connected": "Connected:",
+    "online": "ONLINE",
+    "offline": "OFFLINE",
+    "hardwareFallback": "this machine",
+    "recommendedHint": "Recommended for {hardware}: {commands}. Configure via backend/.env."
+  },
+  "telemetry": {
+    "title": "SHIP TELEMETRY",
+    "expand": "Expand Ship Telemetry",
+    "collapse": "Collapse panel",
+    "vessel": "VESSEL: AURORA-7",
+    "vesselClass": "DEEP SPACE CLASS",
+    "svg": {
+      "eng": "ENG",
+      "pwr": "PWR",
+      "hab": "HAB",
+      "nav": "NAV",
+      "engineTitle": "Engine Condition: {value}%",
+      "energyTitle": "Reactor Energy: {value}%",
+      "oxygenTitle": "Habitat Oxygen: {value}%",
+      "navTitle": "Navigation Array: {value}%"
+    },
+    "metrics": {
+      "energy": "Reactor Energy",
+      "oxygen": "Cabin Oxygen",
+      "hull_integrity": "Hull Integrity",
+      "engine_condition": "Engine Condition",
+      "communication": "Communication",
+      "navigation": "Navigation",
+      "crew_health": "Crew Health",
+      "crew_morale": "Crew Morale",
+      "reserve_fuel": "Reserve Fuel"
+    },
+    "activeScenario": "Active Scenario: {title}",
+    "objectives": "Objectives",
+    "viewer3d": {
+      "badge": "3D HOLO",
+      "dragHint": "Drag to orbit • Scroll to zoom",
+      "holoMode": "Switch to Hologram Mode",
+      "solidMode": "Switch to Tactical Hull Mode",
+      "resetCamera": "Reset 3D camera",
+      "expand": "Expand 3D holographic deck",
+      "collapse": "Close expanded view",
+      "modalTitle": "AURORA-7 — 3D Holographic Telemetry Deck",
+      "webglUnavailable": "WebGL 3D rendering is unavailable in this browser."
+    }
+  },
+  "crew": {
+    "title": "AI CREW AGENTS",
+    "expand": "Expand AI Crew",
+    "collapse": "Collapse panel",
+    "runs": "Runs: {count}",
+    "ms": "{value} ms",
+    "standby": "Standing by for Commander dispatch...",
+    "missionOutcome": "Mission Outcome: {outcome}",
+    "agents": {
+      "commander": { "name": "Commander", "role": "Mission Coordinator" },
+      "engineer": { "name": "Engineer", "role": "Propulsion & Power" },
+      "scientist": { "name": "Scientist", "role": "External Phenomena" },
+      "medical_officer": { "name": "Medical Officer", "role": "Crew Safety" },
+      "safety_officer": { "name": "Safety Officer", "role": "Risk & Compliance" }
+    }
+  },
+  "outcomes": {
+    "success": "SUCCESS",
+    "failure": "FAILURE",
+    "max_iterations_reached": "MAX ITERATIONS",
+    "continue": "IN PROGRESS"
+  },
+  "nodeStatus": {
+    "idle": "idle",
+    "running": "running",
+    "retrying": "retrying",
+    "completed": "completed",
+    "waiting_human": "waiting_human",
+    "error": "error",
+    "skipped": "skipped"
+  },
+  "graph": {
+    "title": "LANGGRAPH LIVE INSPECTOR",
+    "iteration": "Iteration {current}/{max}",
+    "active": "Active: {nodes}",
+    "replayBadge": "REPLAY VIEW (READ-ONLY)",
+    "executedTimes": "Executed {count} times",
+    "parallelBranch": "Parallel Send() Branch",
+    "legend": {
+      "idle": "Idle",
+      "running": "Running",
+      "completed": "Completed",
+      "hitl": "HITL Wait",
+      "error": "Error/Reject",
+      "rerun": "Re-run/Loop"
+    }
+  },
+  "nodeDrawer": {
+    "mechanism": "LangGraph Mechanism",
+    "status": "Status",
+    "iterationRuns": "Iteration / Runs",
+    "iterValue": "Iter {iteration} • {runs}x",
+    "duration": "Duration",
+    "attempts": "Attempts",
+    "model": "Model",
+    "tokenUsage": "Token Usage",
+    "tokensFmt": "in:{input} / out:{output}",
+    "errorPrefix": "Error: {error}",
+    "systemPrompt": "System Prompt",
+    "llmInput": "LLM Input",
+    "structuredOutput": "Structured Output (Pydantic)",
+    "partialUpdate": "Returned Partial State Update",
+    "planRejectedSummary": "Plan rejected — returning to Commander"
+  },
+  "console": {
+    "resizeTitle": "Drag to resize Developer Console",
+    "expand": "Expand Developer Console",
+    "collapse": "Collapse Developer Console",
+    "tabs": {
+      "logs": "Execution Logs",
+      "state": "State",
+      "diff": "State Diff",
+      "checkpoints": "Checkpoints",
+      "llm": "LLM Calls",
+      "learning": "LangGraph Learning"
+    }
+  },
+  "timeline": {
+    "allTypes": "All Event Types ({count})",
+    "allNodes": "All Nodes",
+    "allSeverities": "All Severities",
+    "info": "Info",
+    "success": "Success",
+    "warn": "Warning / HITL",
+    "error": "Error / Reject",
+    "showing": "Showing {count} events",
+    "empty": "No execution events yet. Click Start Mission to run LangGraph.",
+    "iterPrefix": "I{iteration}",
+    "events": {
+      "mission_started": "Started scenario {scenario} ({mode} mode){forkTag}",
+      "node_started": "Node '{node}' started (attempt #{attempt})",
+      "node_completed": "Node '{node}' completed in {ms} ms",
+      "llm_request_started": "Agent '{agent}' calling {model}",
+      "llm_response_received": "Agent '{agent}' structured response ({ms} ms)",
+      "parallel_branch_started": "Send() fan-out -> [{targets}]",
+      "conditional_edge_selected": "Conditional edge {from} -> {to}",
+      "state_updated": "Partial state update from '{node}' ({keys})",
+      "state_snapshot": "Merged superstep state snapshot (iter {iteration})",
+      "plan_rejected": "Plan rejected by {by}",
+      "checkpoint_created": "SQLite checkpoint saved: {id}...",
+      "human_approval_requested": "Graph paused via interrupt() — awaiting Captain decision",
+      "execution_resumed": "Resumed via Command(resume={decision})",
+      "retry": "RetryPolicy triggered on '{node}' (attempt #{attempt})",
+      "error_fallback": "Unknown error",
+      "mission_completed": "Mission completed: outcome={outcome}"
+    }
+  },
+  "stateTab": {
+    "searchPlaceholder": "Filter keys or values...",
+    "rawJson": "Raw JSON",
+    "treeView": "Tree View",
+    "copied": "Copied",
+    "copyJson": "Copy JSON",
+    "updatedBadge": "UPDATED",
+    "empty": "No MissionState available yet."
+  },
+  "diffTab": {
+    "label": "Superstep Transition:",
+    "stepOption": "Step #{step} (Iter {iteration}) — after {node}",
+    "initNode": "init",
+    "changedCount": "{count} changed field(s)",
+    "empty": "Run a mission to inspect step-by-step MissionState diffs.",
+    "noChanges": "No field changes in this transition."
+  },
+  "checkpointsTab": {
+    "listTitle": "SQLite Checkpoints ({count})",
+    "emptyList": "No persisted checkpoints yet.",
+    "stepRow": "Step {step} • {writer}",
+    "iterShort": "Iter {iteration}",
+    "next": "Next: {nodes}",
+    "selectPrompt": "Select a checkpoint to inspect or fork.",
+    "inspecting": "Inspecting",
+    "parent": "parent: {id}...",
+    "comparePlaceholder": "Compare with checkpoint...",
+    "compareOption": "Step {step} ({id})",
+    "forkButton": "Fork Time Travel",
+    "liveWarning": "Time Travel Fork executes a new LangGraph thread from this checkpoint without erasing original history. In Live Mode, re-executing LLM nodes may produce different responses.",
+    "selectedStateTitle": "Selected Checkpoint State (Step {step})",
+    "comparedStateTitle": "Compared Checkpoint State (Step {step})"
+  },
+  "llmTab": {
+    "empty": "No LLM / Agent invocations recorded yet.",
+    "iterShort": "Iter {iteration}",
+    "tokensFmt": "tokens: in={input} / out={output}",
+    "promptInput": "Prompt Input",
+    "structuredOutput": "Structured Output",
+    "awaiting": "Awaiting response..."
+  },
+  "learningTab": {
+    "docs": "Docs",
+    "implementedIn": "Implemented in:",
+    "inspectNodes": "Inspect nodes:"
+  }
+}

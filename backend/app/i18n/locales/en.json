@@ -1,0 +1,358 @@
+{
+  "prompts": {
+    "commander": "You are the Commander Agent aboard interstellar research vessel AURORA-7. Your responsibility is emergency coordination: analyze ship telemetry, incident severity, previous execution results, safety rejections, and captain feedback. Select ONLY the relevant specialist agents (engineer, scientist, medical_officer) to dispatch in parallel and issue concise directives. Never invent telemetry values; rely strictly on provided state.",
+    "engineer": "You are the Chief Engineer Agent aboard AURORA-7. Your scope is strictly propulsion, reactor energy, hull integrity, and shipboard hardware. Diagnose technical failures, estimate energy/fuel requirements, and recommend ONLY valid action_ids from the scenario's allowed actions list. Avoid unsafe/critical-risk actions unless explicitly justified.",
+    "scientist": "You are the Chief Science Officer Agent aboard AURORA-7. Your scope is external space phenomena, radiation modeling, deep-space signals, navigation vectors, and mission scientific impact. Propose grounded hypotheses within AURORA-7's mission context and recommend ONLY valid action_ids from the allowed actions list.",
+    "medical_officer": "You are the Chief Medical Officer Agent aboard AURORA-7. Your scope is crew health, hypoxia/radiation protection, EVA bio-safety, and crew morale. Assess human risks and recommend protective action_ids from the allowed actions list.",
+    "plan_aggregator": "You are the Commander's Tactical Plan Synthesizer aboard AURORA-7. Combine all specialist reports from the current iteration into a coherent, resource-feasible action plan containing 1 to 2 allowed action_ids. Respect any previous Safety Officer rejection notes and Captain feedback. Never include action_ids that are not in the allowed actions catalog.",
+    "safety_officer": "You are the independent Safety Officer Agent aboard AURORA-7. Audit the proposed action plan for resource feasibility, conflicting actions, and critical-risk hazards. Reject any plan that includes a critical-risk unsafe action, violates resource constraints, or ignores a critical life-support threat. Approve safe, well-balanced plans so they can proceed to Captain approval."
+  },
+  "specialists": {
+    "engineer": "Engineer",
+    "scientist": "Scientist",
+    "medical_officer": "Medical Officer"
+  },
+  "edges": {
+    "send": "Send()",
+    "safety_reject": "Reject -> Revise",
+    "safety_approve": "Approved",
+    "hitl_revise": "Command(revise)",
+    "hitl_approve": "Command(approve)",
+    "eval_continue": "Next Iteration",
+    "eval_complete": "Complete"
+  },
+  "nodes": {
+    "__start__": {
+      "label": "START",
+      "role": "Entry Point",
+      "description": "LangGraph entry sentinel initiating the mission workflow.",
+      "langgraph_mechanism": "START sentinel node"
+    },
+    "incident_init": {
+      "label": "Incident Init",
+      "role": "Scenario Loader",
+      "description": "Loads the selected emergency scenario and initializes AURORA-7 telemetry in MissionState.",
+      "langgraph_mechanism": "StateGraph Node returning partial state update"
+    },
+    "commander": {
+      "label": "Commander",
+      "role": "Mission Coordinator",
+      "description": "Assesses telemetry, resets iteration-scoped specialist reports, and selects specialists to dispatch.",
+      "langgraph_mechanism": "Structured Output Agent + Reducer Reset + Send() Fan-out Source"
+    },
+    "engineer": {
+      "label": "Engineer",
+      "role": "Propulsion & Power",
+      "description": "Diagnoses propulsion, reactor energy, and hull integrity; proposes engineering actions.",
+      "langgraph_mechanism": "Parallel Send() Branch + Custom Reducer Fan-in"
+    },
+    "scientist": {
+      "label": "Scientist",
+      "role": "External Phenomena",
+      "description": "Analyzes deep-space anomalies, radiation storms, and navigation vectors.",
+      "langgraph_mechanism": "Parallel Send() Branch + Custom Reducer Fan-in"
+    },
+    "medical_officer": {
+      "label": "Medical Officer",
+      "role": "Crew Safety",
+      "description": "Evaluates crew health, hypoxia/radiation risks, and morale protection measures.",
+      "langgraph_mechanism": "Parallel Send() Branch + Custom Reducer Fan-in"
+    },
+    "plan_aggregator": {
+      "label": "Plan Aggregator",
+      "role": "Tactical Synthesizer",
+      "description": "Merges parallel specialist reports from the superstep into a single structured action plan.",
+      "langgraph_mechanism": "Fan-in Convergence Node reading reduced specialist_reports"
+    },
+    "safety_officer": {
+      "label": "Safety Officer",
+      "role": "Independent Risk Critic",
+      "description": "Audits proposed plans for hazards and resource feasibility; approves or routes back to Commander.",
+      "langgraph_mechanism": "Conditional Edge + Cyclic Feedback Loop"
+    },
+    "human_approval": {
+      "label": "Human Approval",
+      "role": "Captain Authorization",
+      "description": "Pauses workflow via interrupt() for Captain decision and routes via Command(goto=...).",
+      "langgraph_mechanism": "interrupt() + Command(resume=...) + Command(goto=...)"
+    },
+    "executor": {
+      "label": "Executor",
+      "role": "Deterministic Simulator",
+      "description": "Validates and applies approved actions deterministically with idempotency protection.",
+      "langgraph_mechanism": "Deterministic Non-LLM Node + Idempotent Execution"
+    },
+    "mission_evaluator": {
+      "label": "Mission Evaluator",
+      "role": "Outcome Verifier",
+      "description": "Checks success/failure thresholds and iteration limits; either loops to Commander or finishes.",
+      "langgraph_mechanism": "Conditional Edge + Bounded Cyclic Workflow"
+    },
+    "__end__": {
+      "label": "END",
+      "role": "Terminal State",
+      "description": "LangGraph terminal sentinel indicating workflow completion.",
+      "langgraph_mechanism": "END sentinel node"
+    }
+  },
+  "learning": {
+    "state_graph": {
+      "name": "StateGraph & TypedDict State",
+      "summary": "A directed graph where every node reads a shared typed state and returns partial updates.",
+      "where_used": "backend/app/state/mission_state.py & backend/app/graph/workflow.py"
+    },
+    "send_fan_out": {
+      "name": "Dynamic Routing with Send() (Fan-out / Fan-in)",
+      "summary": "Commander dynamically decides at runtime which specialists to spawn in parallel using Send().",
+      "where_used": "backend/app/graph/routing.py -> route_to_specialists()"
+    },
+    "reducers": {
+      "name": "Custom Reducers",
+      "summary": "Reducers safely merge parallel node outputs and allow iteration-scoped resets without mutating state.",
+      "where_used": "backend/app/state/reducers.py -> merge_specialist_reports()"
+    },
+    "conditional_cycles": {
+      "name": "Conditional Edges & Bounded Cycles",
+      "summary": "Safety Officer and Mission Evaluator route back to Commander for revisions or next iterations, bounded by max_iterations.",
+      "where_used": "backend/app/graph/routing.py -> route_after_safety(), route_after_evaluation()"
+    },
+    "hitl_interrupt": {
+      "name": "Human-in-the-Loop: interrupt() & Command",
+      "summary": "Suspends execution inside human_approval, persists state to SQLite, and resumes via Command(resume=...) with dynamic Command(goto=...).",
+      "where_used": "backend/app/graph/nodes.py -> human_approval_node()"
+    },
+    "checkpointing_time_travel": {
+      "name": "AsyncSqliteSaver Checkpointing & Time Travel",
+      "summary": "Every superstep is persisted in SQLite. You can inspect checkpoint history, restore paused missions, or fork an alternate timeline from any checkpoint.",
+      "where_used": "backend/app/persistence/checkpointer.py"
+    },
+    "retry_policy": {
+      "name": "Node-Level RetryPolicy",
+      "summary": "Automatically retries transient LLM parsing/provider errors with exponential backoff while failing fast if Ollama is unreachable.",
+      "where_used": "backend/app/graph/workflow.py -> LLM_RETRY_POLICY"
+    },
+    "streaming": {
+      "name": "Multi-Mode Streaming (updates, values, custom, debug)",
+      "summary": "Streams real-time LangGraph superstep updates, task lifecycle events, checkpoints, and custom LLM telemetry over SSE.",
+      "where_used": "backend/app/streaming/manager.py"
+    }
+  },
+  "scenarios": {
+    "engine_failure": {
+      "title": "Engine Failure",
+      "subtitle": "Debris impact on primary fusion thruster",
+      "description": "High-velocity micrometeoroid debris struck AURORA-7's aft propulsion bay. Primary thruster efficiency dropped to 35%, reactor power bus is fluctuating, and hull micro-fractures are stressing aft structural bulkheads.",
+      "objectives": [
+        "Restore engine condition to at least 70%",
+        "Stabilize ship energy at or above 60%",
+        "Maintain crew health >= 75% and hull integrity >= 65%"
+      ],
+      "actions": {
+        "eva_thruster_repair": {
+          "label": "EVA Primary Thruster Repair",
+          "description": "Deploy robotic + EVA repair team to replace damaged magnetic nozzle coils."
+        },
+        "engage_reserve_thruster": {
+          "label": "Engage Reserve Ion Thruster",
+          "description": "Switch propulsion load to auxiliary ion thruster using reserve propellant."
+        },
+        "rebalance_reactor_bus": {
+          "label": "Rebalance Reactor Power Bus",
+          "description": "Isolate shorted aft conduits and reroute auxiliary capacitor banks."
+        },
+        "medical_eva_prep": {
+          "label": "Crew EVA Bio-Shielding & Triage",
+          "description": "Administer radiation prophylaxis and monitor EVA crew vitals."
+        },
+        "overdrive_damaged_core": {
+          "label": "Emergency Core Overdrive (Unsafe)",
+          "description": "Force damaged thruster to 120% output without coil replacement."
+        }
+      }
+    },
+    "oxygen_leak": {
+      "title": "Oxygen Leak",
+      "subtitle": "Pressure breach in Habitat Module B",
+      "description": "A seal rupture in Habitat Module B is venting breathable atmosphere into space. Cabin oxygen has dropped to 44% and crew fatigue is rising rapidly.",
+      "objectives": [
+        "Restore cabin oxygen to at least 75%",
+        "Stabilize hull integrity >= 70%",
+        "Keep crew health >= 75%"
+      ],
+      "actions": {
+        "isolate_habitat_b": {
+          "label": "Isolate Habitat Module B",
+          "description": "Seal emergency bulkheads around Module B after confirming crew evacuation."
+        },
+        "deploy_nanoseal_patch": {
+          "label": "Deploy Nanoseal Hull Patch",
+          "description": "Apply self-curing composite sealant across the ruptured pressure ring."
+        },
+        "activate_reserve_o2_scrubbers": {
+          "label": "Activate Reserve O2 Electrolyzers",
+          "description": "Spin up backup electrolysis units to rapidly replenish cabin oxygen."
+        },
+        "crew_hypoxia_protocol": {
+          "label": "Initiate Crew Hypoxia Medical Protocol",
+          "description": "Distribute personal O2 masks, run hyperbaric checks, and calm crew."
+        },
+        "vent_all_nonessential_bays": {
+          "label": "Emergency Full-Deck Depressurization (Unsafe)",
+          "description": "Purge three adjacent decks simultaneously without full crew sweep."
+        }
+      }
+    },
+    "unknown_signal": {
+      "title": "Unknown Signal",
+      "subtitle": "Unidentified structured transmission from deep-space anomaly",
+      "description": "AURORA-7's long-range array locked onto a repeating non-natural narrowband signal 2.4 AU off-axis. Sensor harmonics are degrading navigation calibration and comms clarity.",
+      "objectives": [
+        "Restore communication >= 80% and navigation >= 80%",
+        "Resolve signal protocol (analyze safely or shield & bypass)",
+        "Maintain crew morale >= 75% and energy >= 65%"
+      ],
+      "actions": {
+        "passive_spectral_analysis": {
+          "label": "Passive Isolated Spectral Analysis",
+          "description": "Decode signal harmonics inside an air-gapped scientific sandbox."
+        },
+        "recalibrate_nav_array": {
+          "label": "Recalibrate Star-Tracker & Comms Filter",
+          "description": "Apply adaptive notch filtering to clear harmonic interference."
+        },
+        "chart_safe_recon_vector": {
+          "label": "Chart Shielded Reconnaissance Vector",
+          "description": "Adjust trajectory slightly to collect telemetry from a safe standoff distance."
+        },
+        "crew_psych_briefing": {
+          "label": "Crew Psychological & First-Contact Briefing",
+          "description": "Brief crew on verified telemetry to prevent stress and rumor escalation."
+        },
+        "broadcast_unfiltered_reply": {
+          "label": "High-Power Unfiltered Reply & Direct Intercept (Unsafe)",
+          "description": "Transmit ship coordinates at full array power and burn directly toward source."
+        }
+      }
+    },
+    "solar_storm": {
+      "title": "Solar Storm",
+      "subtitle": "Class-X coronal mass ejection inbound",
+      "description": "A massive coronal mass ejection is sweeping across AURORA-7's trajectory. Radiation flux threatens unshielded avionics, communications, and crew health.",
+      "objectives": [
+        "Protect electronics: communication >= 70% and navigation >= 70%",
+        "Maintain energy >= 60% and crew health >= 80%",
+        "Activate radiation storm shielding"
+      ],
+      "actions": {
+        "boost_magnetic_deflector": {
+          "label": "Boost Magnetic Radiation Deflector",
+          "description": "Channel capacitor power into forward dipole radiation shielding."
+        },
+        "shed_noncritical_loads": {
+          "label": "Shed Non-Critical Avionics & Reroute Power",
+          "description": "Place science bays and auxiliary lighting in Faraday sleep mode to recover energy."
+        },
+        "model_cme_wavefront": {
+          "label": "Model CME Wavefront & Orient Hull",
+          "description": "Calculate optimal attitude angle to place water tanks between sun and hab deck."
+        },
+        "storm_shelter_protocol": {
+          "label": "Crew Radiation Shelter & Dosimetry",
+          "description": "Move crew into shielded core compartment and administer radioprotectants."
+        },
+        "ignore_storm_full_burn": {
+          "label": "Full-Power Unshielded Sprint (Unsafe)",
+          "description": "Attempt to outrun the CME wavefront with shields offline."
+        }
+      }
+    },
+    "critical_cascade": {
+      "title": "Critical Cascade",
+      "subtitle": "Compound failure across reactor, propulsion, and comms",
+      "description": "A secondary power surge triggered a cascading failure across AURORA-7: reactor energy dropped to 42%, main engine to 38%, communications to 36%, and cabin oxygen is slipping. Multiple coordinated iterations are required.",
+      "objectives": [
+        "Recover energy >= 65% and engine condition >= 70%",
+        "Recover communication >= 68% and oxygen >= 75%",
+        "Preserve crew health >= 72% and hull integrity >= 65%"
+      ],
+      "actions": {
+        "emergency_bus_recovery": {
+          "label": "Emergency Reactor Bus Recovery",
+          "description": "Reset tripped superconducting breakers and restore primary reactor output."
+        },
+        "stabilize_thruster_manifold": {
+          "label": "Stabilize Thruster Injector Manifold",
+          "description": "Bypass damaged plasma injectors and recalibrate propulsion gimbal."
+        },
+        "restore_comms_transponder": {
+          "label": "Restore Deep-Space Comms Transponder",
+          "description": "Switch to redundant phased-array antenna and resync telemetry carrier."
+        },
+        "life_support_stabilization": {
+          "label": "Life Support & Crew Stabilization",
+          "description": "Boost O2 recirculation, patch minor bulkhead vents, and support crew."
+        },
+        "hard_reboot_all_systems": {
+          "label": "Unstaged Cold Reboot of All Systems (Unsafe)",
+          "description": "Drop reactor, life support, and thrusters simultaneously to force reset."
+        }
+      }
+    }
+  },
+  "demo": {
+    "commander_feedback_summary": "Iteration {iteration} (Captain Revision): Incorporating Captain feedback '{feedback}' for {title}.",
+    "commander_feedback_rationale": "Dispatching specialists in parallel to re-evaluate resource margins and incorporate Captain's explicit directives.",
+    "commander_safety_summary": "Iteration {iteration} (Safety Revision #{revision_count}): Previous draft rejected by Safety Officer due to critical hazard. Re-tasking specialists for a compliant plan.",
+    "commander_safety_rationale": "Safety audit flagged unacceptable risk in draft #1; parallel specialist consultation required to synthesize a safe staged recovery.",
+    "commander_default_summary": "Iteration {iteration}: Assessing {title} on AURORA-7. Energy={energy}%, Oxygen={oxygen}%, Engine={engine}%.",
+    "commander_default_rationale": "Dispatching {specialists} in parallel via LangGraph Send() for multi-domain diagnostics.",
+    "commander_directive": "Diagnose {title} impact within {specialist} domain and propose valid actions.",
+    "specialist_unsafe_diagnosis": "Rapid high-output intervention considered for {title}, though thermal/structural margins are tight.",
+    "specialist_unsafe_resources": "High immediate resource draw; elevated structural/crew risk.",
+    "specialist_unsafe_consequences": "Fast attempt via {action_label}, carries critical hazard risk.",
+    "specialist_safe_diagnosis": "[{agent_label}] Telemetry verified (Energy {energy}%, O2 {oxygen}%, Hull {hull}%, Engine {engine}%). Safe stabilization path identified.",
+    "specialist_safe_resources": "Within current AURORA-7 energy and reserve fuel margins.",
+    "specialist_safe_consequences": "Executing {action_labels} safely advances mission objectives.",
+    "plan_unsafe_title": "Rapid Response Draft #{iteration}.{draft_num}",
+    "plan_unsafe_summary": "Initial aggressive response using '{action_label}' to force immediate recovery during {title}.",
+    "plan_unsafe_outcomes": "Rapid partial metric recovery at the cost of high collateral risk.",
+    "plan_unsafe_resources": "Requires {requirements}.",
+    "plan_safe_title": "Stabilization Plan — Cycle {iteration} (Rev {revision_count})",
+    "plan_safe_summary": "Coordinated safe execution of: {labels}.{fb_note}",
+    "plan_safe_fb_note": " Adjusted for Captain note: '{feedback}'.",
+    "plan_safe_outcomes": "Improves critical telemetry while preserving crew safety and resource buffers.",
+    "plan_safe_resources": "Validated against current energy and reserve fuel levels.",
+    "safety_unsafe_finding": "Critical-risk action detected: {actions}. Violates AURORA-7 crew and hull safety directives.",
+    "safety_invalid_finding": "Disallowed actions: {actions}",
+    "safety_required_revisions": "Remove critical-risk shortcut actions and replace with staged, resource-safe engineering/medical stabilization procedures.",
+    "safety_rejected_summary": "PLAN REJECTED: Unacceptable operational hazard detected. Returning to Commander.",
+    "safety_approved_findings": [
+      "All proposed actions are in the scenario allowed catalog.",
+      "Resource margins verified against current ship telemetry.",
+      "No conflicting or critical-risk procedures detected."
+    ],
+    "safety_approved_summary": "PLAN APPROVED: Safe for Captain authorization and execution."
+  },
+  "eval": {
+    "failure": "Critical threshold breached: {breaches}",
+    "success": "All mission objectives and ship telemetry thresholds achieved. AURORA-7 stabilized.",
+    "max_iterations": "Reached maximum iteration limit ({max_iterations}) before full stabilization. Remaining flags: {missing_flags}.",
+    "continue": "Stabilization incomplete after iteration {iteration}. Unmet telemetry targets: {unmet}; Pending flags: {missing_flags}.",
+    "none": "none"
+  },
+  "events": {
+    "incident_init": "Emergency initialized: {title} ({severity})",
+    "commander_dispatch": "Commander dispatched {specialists}: {priority}",
+    "specialist_recommend": "{agent} recommended {actions}",
+    "plan_assembled": "Plan '{title}' assembled with actions: {actions}",
+    "safety_verdict": "Safety Officer {verdict} plan: {summary}",
+    "safety_approved": "APPROVED",
+    "safety_rejected": "REJECTED",
+    "captain_approved": "Captain APPROVED action plan for execution.",
+    "captain_rejected_default": "Captain rejected the proposed plan; formulate a safer alternative.",
+    "captain_rejected": "Captain {status} plan. Feedback: {feedback}",
+    "executor_ran": "Executed {actions}; telemetry deltas: {deltas}",
+    "executor_noop": "No new actions executed (idempotency guard or resource check).",
+    "eval_summary": "Evaluation outcome={outcome}: {reason}"
+  }
+}

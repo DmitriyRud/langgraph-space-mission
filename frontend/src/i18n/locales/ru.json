@@ -1,0 +1,304 @@
+{
+  "app": {
+    "documentTitle": "AI Space Mission — Интерактивный симулятор LangGraph (AURORA-7)",
+    "switchToDemo": "Переключить в Demo Mode",
+    "toast": {
+      "restoredPaused": "Восстановлена приостановленная миссия {missionId} из SQLite checkpoint.",
+      "backendError": "Не удалось подключиться к backend API.",
+      "startError": "Ошибка запуска миссии",
+      "randomSelected": "Выбран случайный сценарий: {title}",
+      "restoredMission": "Восстановлена миссия {missionId} ({status}).",
+      "restoreError": "Не удалось восстановить миссию",
+      "resumeError": "Не удалось возобновить миссию",
+      "switchedToDemoResumed": "Миссия переключена в Demo Mode и возобновлена из checkpoint.",
+      "startedNewDemo": "Запущена новая миссия в Demo Mode.",
+      "forkCreated": "Создано ответвление Time Travel: {missionId} из {checkpointId}...",
+      "forkError": "Не удалось создать ответвление из checkpoint",
+      "exportError": "Ошибка экспорта JSON"
+    }
+  },
+  "header": {
+    "subtitle": "Интерактивный LangGraph Live Inspector",
+    "awaitingApproval": "ОЖИДАНИЕ РЕШЕНИЯ КАПИТАНА",
+    "demoMode": "DEMO MODE",
+    "liveLlm": "LIVE LLM",
+    "connectedTo": "Подключено к {provider}",
+    "sseTitle": "Поток событий Server-Sent Events",
+    "sseLive": "SSE ПОДКЛЮЧЁН",
+    "sseIdle": "SSE ОЖИДАНИЕ",
+    "settingsTitle": "Настройки системы и LLM"
+  },
+  "missionStatus": {
+    "Operational": "Штатный режим",
+    "Alert": "Тревога",
+    "Critical": "Критический",
+    "Stabilized": "Стабилизирован",
+    "Failed": "Авария"
+  },
+  "missionDbStatus": {
+    "created": "создана",
+    "running": "выполняется",
+    "awaiting_approval": "ожидает капитана",
+    "completed": "завершена",
+    "failed": "провалена",
+    "error": "ошибка",
+    "cancelled": "отменена"
+  },
+  "severity": {
+    "low": "НИЗКИЙ",
+    "medium": "СРЕДНИЙ",
+    "high": "ВЫСОКИЙ",
+    "critical": "КРИТИЧЕСКИЙ"
+  },
+  "risk": {
+    "low": "низкий",
+    "medium": "средний",
+    "high": "высокий",
+    "critical": "критический"
+  },
+  "controlBar": {
+    "random": "Случайный",
+    "randomTitle": "Выбрать случайный аварийный сценарий",
+    "startMission": "Запустить миссию",
+    "reset": "Сброс",
+    "resetTitle": "Сбросить текущее отображение",
+    "restoreMission": "Восстановить миссию ({count})",
+    "restoreTitle": "Восстановить сохранённую или приостановленную миссию из SQLite checkpoints",
+    "live": "LIVE",
+    "replay": "REPLAY ({count})",
+    "prevEvent": "Предыдущее записанное событие",
+    "nextEvent": "Следующее записанное событие",
+    "checkpoints": "Checkpoints",
+    "exportJson": "Экспорт JSON",
+    "iter": "ИТЕРАЦИЯ {current}/{max}"
+  },
+  "hitl": {
+    "header": "LANGGRAPH INTERRUPT() — ТРЕБУЕТСЯ РЕШЕНИЕ КАПИТАНА (ИТЕРАЦИЯ {iteration})",
+    "riskLabel": "Риск: {risk}",
+    "proposedActions": "Предложенные действия ({count})",
+    "projectedDeltas": "Прогноз изменения телеметрии",
+    "resources": "Ресурсы:",
+    "safetyVerdict": "Вердикт Офицера безопасности: {verdict}",
+    "verdictApproved": "ОДОБРЕНО",
+    "verdictEscalated": "ЭСКАЛИРОВАНО",
+    "feedbackLabel": "Комментарий капитана (передаётся Командиру при отклонении или запросе доработки)",
+    "feedbackPlaceholder": "Например: «Беречь резервное топливо и снизить риск для экипажа»",
+    "reject": "Отклонить",
+    "requestRevision": "На доработку",
+    "defaultRevisionFeedback": "Доработать план с меньшим уровнем риска",
+    "approve": "Одобрить и выполнить"
+  },
+  "settings": {
+    "title": "Настройки LLM и симулятора",
+    "languageSection": "ЯЗЫК ИНТЕРФЕЙСА",
+    "languageHint": "Применяется к интерфейсу, сценариям, узлам графа, учебной панели и новым миссиям.",
+    "executionMode": "РЕЖИМ ВЫПОЛНЕНИЯ",
+    "demoMode": "Demo Mode",
+    "liveMode": "Live Mode (Ollama)",
+    "modeDescription": "В обоих режимах на backend выполняется один и тот же настоящий LangGraph StateGraph с reducers, checkpoints и human-in-the-loop interrupt(). В Demo Mode агенты возвращают детерминированные ответы без обращения к LLM — это удобно для быстрого тестирования и презентации.",
+    "localLlmStatus": "СТАТУС ЛОКАЛЬНОЙ LLM",
+    "refresh": "Обновить",
+    "provider": "Провайдер:",
+    "endpoint": "Адрес:",
+    "activeModel": "Активная модель:",
+    "connected": "Подключение:",
+    "online": "ПОДКЛЮЧЕНО",
+    "offline": "НЕДОСТУПНО",
+    "hardwareFallback": "вашей системы",
+    "recommendedHint": "Рекомендуемые модели для {hardware}: {commands}. Настраивается в backend/.env."
+  },
+  "telemetry": {
+    "title": "ТЕЛЕМЕТРИЯ КОРАБЛЯ",
+    "expand": "Развернуть телеметрию корабля",
+    "collapse": "Свернуть панель",
+    "vessel": "КОРАБЛЬ: AURORA-7",
+    "vesselClass": "ДАЛЬНЯЯ ЭКСПЕДИЦИЯ",
+    "svg": {
+      "eng": "ДВИГ",
+      "pwr": "РЕАКТ",
+      "hab": "ЖИЛ",
+      "nav": "НАВ",
+      "engineTitle": "Состояние двигателя: {value}%",
+      "energyTitle": "Энергия реактора: {value}%",
+      "oxygenTitle": "Кислород в отсеках: {value}%",
+      "navTitle": "Навигация: {value}%"
+    },
+    "metrics": {
+      "energy": "Энергия реактора",
+      "oxygen": "Кислород",
+      "hull_integrity": "Целостность корпуса",
+      "engine_condition": "Состояние двигателя",
+      "communication": "Связь",
+      "navigation": "Навигация",
+      "crew_health": "Здоровье экипажа",
+      "crew_morale": "Мораль экипажа",
+      "reserve_fuel": "Резервное топливо"
+    },
+    "activeScenario": "Сценарий: {title}",
+    "objectives": "Цели миссии",
+    "viewer3d": {
+      "badge": "3D ГОЛОГРАММА",
+      "dragHint": "Вращение мышью • Колесо — зум",
+      "holoMode": "Включить режим голограммы",
+      "solidMode": "Включить режим тактического корпуса",
+      "resetCamera": "Сбросить камеру 3D",
+      "expand": "Развернуть 3D-голограмму",
+      "collapse": "Свернуть просмотр",
+      "modalTitle": "AURORA-7 — 3D-голограмма телеметрии корабля",
+      "webglUnavailable": "WebGL 3D недоступен в этом браузере."
+    }
+  },
+  "crew": {
+    "title": "ИИ-ЭКИПАЖ",
+    "expand": "Развернуть панель ИИ-экипажа",
+    "collapse": "Свернуть панель",
+    "runs": "Запусков: {count}",
+    "ms": "{value} мс",
+    "standby": "Ожидание задачи от Командира...",
+    "missionOutcome": "Итог миссии: {outcome}",
+    "agents": {
+      "commander": { "name": "Командир", "role": "Координатор миссии" },
+      "engineer": { "name": "Инженер", "role": "Двигатели и энергия" },
+      "scientist": { "name": "Учёный", "role": "Внешние явления" },
+      "medical_officer": { "name": "Медик", "role": "Безопасность экипажа" },
+      "safety_officer": { "name": "Офицер безопасности", "role": "Аудит рисков" }
+    }
+  },
+  "outcomes": {
+    "success": "УСПЕХ",
+    "failure": "ПРОВАЛ",
+    "max_iterations_reached": "ЛИМИТ ИТЕРАЦИЙ",
+    "continue": "В ПРОЦЕССЕ"
+  },
+  "nodeStatus": {
+    "idle": "ожидание",
+    "running": "в работе",
+    "retrying": "повтор",
+    "completed": "готово",
+    "waiting_human": "ждёт капитана",
+    "error": "отклонено",
+    "skipped": "пропущен"
+  },
+  "graph": {
+    "title": "LANGGRAPH LIVE INSPECTOR",
+    "iteration": "Итерация {current}/{max}",
+    "active": "Активны: {nodes}",
+    "replayBadge": "РЕЖИМ REPLAY (ТОЛЬКО ПРОСМОТР)",
+    "executedTimes": "Выполнено раз: {count}",
+    "parallelBranch": "Параллельная ветка Send()",
+    "legend": {
+      "idle": "Ожидание",
+      "running": "Выполняется",
+      "completed": "Завершён",
+      "hitl": "Ждёт капитана",
+      "error": "Ошибка/Отклонён",
+      "rerun": "Повтор/Цикл"
+    }
+  },
+  "nodeDrawer": {
+    "mechanism": "Механизм LangGraph",
+    "status": "Статус",
+    "iterationRuns": "Итерация / Запуски",
+    "iterValue": "Итер. {iteration} • {runs}x",
+    "duration": "Длительность",
+    "attempts": "Попытки",
+    "model": "Модель",
+    "tokenUsage": "Токены",
+    "tokensFmt": "вход: {input} / выход: {output}",
+    "errorPrefix": "Ошибка: {error}",
+    "systemPrompt": "Системный промпт агента",
+    "llmInput": "Входные данные LLM",
+    "structuredOutput": "Структурированный ответ (Pydantic)",
+    "partialUpdate": "Возвращённое частичное обновление состояния",
+    "planRejectedSummary": "План отклонён — возврат Командиру"
+  },
+  "console": {
+    "resizeTitle": "Потяните для изменения высоты панели",
+    "expand": "Развернуть консоль разработчика",
+    "collapse": "Свернуть консоль разработчика",
+    "tabs": {
+      "logs": "Логи выполнения",
+      "state": "Состояние (State)",
+      "diff": "State Diff",
+      "checkpoints": "Checkpoints",
+      "llm": "Вызовы LLM",
+      "learning": "Изучение LangGraph"
+    }
+  },
+  "timeline": {
+    "allTypes": "Все типы событий ({count})",
+    "allNodes": "Все узлы",
+    "allSeverities": "Все уровни",
+    "info": "Информация",
+    "success": "Успех",
+    "warn": "Внимание / HITL",
+    "error": "Ошибка / Отклонение",
+    "showing": "Показано событий: {count}",
+    "empty": "Событий пока нет. Нажмите «Запустить миссию», чтобы стартовать граф LangGraph.",
+    "iterPrefix": "И{iteration}",
+    "events": {
+      "mission_started": "Запущен сценарий {scenario} (режим {mode}){forkTag}",
+      "node_started": "Узел '{node}' запущен (попытка #{attempt})",
+      "node_completed": "Узел '{node}' завершён за {ms} мс",
+      "llm_request_started": "Агент '{agent}' обращается к {model}",
+      "llm_response_received": "Агент '{agent}' вернул структурированный ответ ({ms} мс)",
+      "parallel_branch_started": "Send() fan-out -> [{targets}]",
+      "conditional_edge_selected": "Условный переход {from} -> {to}",
+      "state_updated": "Частичное обновление состояния из '{node}' ({keys})",
+      "state_snapshot": "Объединённый снимок состояния superstep (итер. {iteration})",
+      "plan_rejected": "План отклонён ({by})",
+      "checkpoint_created": "Сохранён SQLite checkpoint: {id}...",
+      "human_approval_requested": "Граф приостановлен через interrupt() — ожидание решения капитана",
+      "execution_resumed": "Возобновление через Command(resume={decision})",
+      "retry": "Сработал RetryPolicy на узле '{node}' (попытка #{attempt})",
+      "error_fallback": "Неизвестная ошибка",
+      "mission_completed": "Миссия завершена: результат={outcome}"
+    }
+  },
+  "stateTab": {
+    "searchPlaceholder": "Поиск по ключам или значениям...",
+    "rawJson": "Raw JSON",
+    "treeView": "Дерево JSON",
+    "copied": "Скопировано",
+    "copyJson": "Копировать JSON",
+    "updatedBadge": "ИЗМЕНЕНО",
+    "empty": "Состояние MissionState пока недоступно."
+  },
+  "diffTab": {
+    "label": "Переход superstep:",
+    "stepOption": "Шаг #{step} (Итер. {iteration}) — после {node}",
+    "initNode": "инициализации",
+    "changedCount": "Изменено полей: {count}",
+    "empty": "Запустите миссию, чтобы просматривать пошаговый State Diff.",
+    "noChanges": "На этом шаге поля состояния не изменились."
+  },
+  "checkpointsTab": {
+    "listTitle": "SQLite Checkpoints ({count})",
+    "emptyList": "Сохранённых checkpoints пока нет.",
+    "stepRow": "Шаг {step} • {writer}",
+    "iterShort": "Итер. {iteration}",
+    "next": "Далее: {nodes}",
+    "selectPrompt": "Выберите checkpoint для просмотра или запуска Time Travel.",
+    "inspecting": "Просмотр",
+    "parent": "родитель: {id}...",
+    "comparePlaceholder": "Сравнить с checkpoint...",
+    "compareOption": "Шаг {step} ({id})",
+    "forkButton": "Ответвить (Time Travel)",
+    "liveWarning": "Time Travel создаёт новый независимый поток LangGraph из выбранного checkpoint, не удаляя исходную историю. В Live Mode повторный запуск LLM-узлов может дать новые ответы.",
+    "selectedStateTitle": "Состояние выбранного checkpoint (Шаг {step})",
+    "comparedStateTitle": "Сравниваемый checkpoint (Шаг {step})"
+  },
+  "llmTab": {
+    "empty": "Вызовов LLM / агентов пока не зафиксировано.",
+    "iterShort": "Итер. {iteration}",
+    "tokensFmt": "токены: вход={input} / выход={output}",
+    "promptInput": "Входной промпт",
+    "structuredOutput": "Структурированный ответ",
+    "awaiting": "Ожидание ответа..."
+  },
+  "learningTab": {
+    "docs": "Документация",
+    "implementedIn": "Реализовано в:",
+    "inspectNodes": "Инспектировать узлы:"
+  }
+}

@@ -1,0 +1,10 @@
+[project]
+name = "ai-space-mission-backend"
+version = "1.0.0"
+description = "LangGraph Interactive Space Mission Simulator Backend"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
