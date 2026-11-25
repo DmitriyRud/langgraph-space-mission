@@ -56,17 +56,17 @@ flowchart LR
     CMD -. "Send() Fan-out" .-> ENG[engineer]
     CMD -. "Send() Fan-out" .-> SCI[scientist]
     CMD -. "Send() Fan-out" .-> MED[medical_officer]
-    ENG --> AGG[plan_aggregator<br/>Fan-in via Reducer]
+    ENG --> AGG["plan_aggregator<br/>Fan-in via Reducer"]
     SCI --> AGG
     MED --> AGG
     AGG --> SAFE[safety_officer]
     SAFE -. "Reject -> Revise" .-> CMD
-    SAFE -. "Approved" .-> HITL[human_approval<br/>interrupt()]
+    SAFE -. "Approved" .-> HITL["human_approval<br/>interrupt()"]
     HITL -. "Command(revise)" .-> CMD
-    HITL -. "Command(approve)" .-> EXEC[executor<br/>Deterministic]
+    HITL -. "Command(approve)" .-> EXEC["executor<br/>Deterministic"]
     EXEC --> EVAL[mission_evaluator]
     EVAL -. "Next Iteration" .-> CMD
-    EVAL -. "Success / Failure / Limit" .-> END((END))
+    EVAL -. "Success / Failure / Limit" .-> FINISH((END))
 ```
 
 ```mermaid
